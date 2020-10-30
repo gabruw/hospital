@@ -1,0 +1,159 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+	<ui:define name="content">
+		<h2 class="page-header">Gerenciamento de Prontuarios</h2>
+
+		<br />
+
+		<h:form id="formPrincipal">
+			<p:messages id="messages" showDetail="true" closable="true" />
+
+			<div align="center">
+				<p:dataTable var="lista" value="#{prontuariosBean.allProntuarios}"
+					id="tabela" emptyMessage="Nenhum registro encontrado"
+					paginatorTemplate="{RowsPerPageDropdown} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+					paginator="true" rows="10"
+					rowsPerPageTemplate="5,10,25,50,100,9999" style="width:100%">
+
+					<p:column headerText="Código" sortBy="#{lista.idProntuario}"
+						filterBy="#{lista.idProntuario}">
+						<h:outputText value="#{lista.idProntuario}" />
+					</p:column>
+
+					<p:column headerText="Data" sortBy="#{lista.data}"
+						filterBy="#{lista.data}">
+						<h:outputText value="#{lista.data}" />
+					</p:column>
+
+					<p:column headerText="Descriçao" sortBy="#{lista.descricao}"
+						filterBy="#{lista.descricao}">
+						<h:outputText value="#{lista.descricao}" />
+					</p:column>
+
+					<p:column headerText="Observaçoes" sortBy="#{lista.observacoes}"
+						filterBy="#{lista.observacoes}">
+						<h:outputText value="#{lista.observacoes}" />
+					</p:column>
+
+					<p:column headerText="Opções" exportable="false">
+						<center>
+							<p:commandButton icon="ui-icon-pencil" value="Editar"
+								onclick="PF('record').show();"
+								update="formPrincipal:panelRecord" process="@this">
+								<f:setPropertyActionListener
+									target="#{prontuariosBean.prontuarios}" value="#{lista}" />
+							</p:commandButton>
+
+							<p:commandButton icon="ui-icon-pencil" value="Deletar"
+								onclick="record.hide()" update="formPrincipal:panelRecord"
+								process="@this">
+								<f:setPropertyActionListener
+									target="#{prontuariosBean.prontuarios}"
+									value="#{prontuariosBean.remover}" />
+							</p:commandButton>
+						</center>
+					</p:column>
+				</p:dataTable>
+
+				<p:column>
+					<p:commandButton icon="ui-icon-plus" value="Novo"
+						onclick="PF('record').show();">
+					</p:commandButton>
+				</p:column>
+			</div>
+
+			<div align="center">
+				<h3>Exportar dados da página</h3>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/excel.png" width="24" />
+					<p:dataExporter type="xls" target="tabela" fileName="arq" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/pdf.png" width="24" />
+					<p:dataExporter type="pdf" target="tabela" fileName="arq" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/csv.png" width="24" />
+					<p:dataExporter type="csv" target="tabela" fileName="arq" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/xml.png" width="24" />
+					<p:dataExporter type="xml" target="tabela" fileName="arq" />
+				</h:commandLink>
+			</div>
+
+			<p:dialog header="Novo" widgetVar="record" modal="false"
+				focus="descricaoProntuario">
+				<p:panelGrid id="panelRecord" columns="2"> 
+                    Codigo:
+                    <p:inputText id="idProntuario"
+						value="#{prontuariosBean.prontuarios.idProntuario}"
+						disabled="true" /> 
+						       
+                    Data:
+                    <p:datePicker id="buttonbar"
+						value="#{prontuariosBean.prontuarios.data}" showButtonBar="true" />
+						
+                    Descriçao:
+                    <p:inputText id="descricaoProntuario"
+						value="#{prontuariosBean.prontuarios.descricao}" />
+						         
+                    Observaçoes:
+                    <p:inputText id="tipoSanguineoPacientes"
+						value="#{prontuariosBean.prontuarios.observacoes}" />
+						
+                    Paciente:
+                    <p:selectOneMenu id="pacienteProntuario"
+						value="#{prontuariosBean.pacienteId}" style="width:179px"
+						dir="rtl">
+						<c:forEach items="#{pacientesBean.allPacientes}" var="paciente">
+							<f:selectItem
+								itemLabel="#{paciente.idPaciente} #{paciente.nomePaciente}"
+								itemValue="#{paciente.idPaciente}" />
+						</c:forEach>
+					</p:selectOneMenu>
+					
+                    Funcionario:
+                    <p:selectOneMenu id="funcionarioProntuario"
+						value="#{prontuariosBean.idFuncionario}" style="width:179px"
+						dir="rtl">
+						<c:forEach items="#{funcionariosBean.allFuncionarios}"
+							var="funcionario">
+							<f:selectItem
+								itemLabel="#{funcionario.idFuncionario} #{funcionario.nomeFuncionario}"
+								itemValue="#{funcionario.idFuncionario}" />
+						</c:forEach>
+					</p:selectOneMenu>
+				</p:panelGrid>
+
+				<p:commandButton value="Salvar"
+					actionListener="#{prontuariosBean.salvar}" onclick="record.hide()"
+					alt="Record">
+				</p:commandButton>
+
+				<p:commandButton value="Deletar"
+					actionListener="#{prontuariosBean.remover}" onclick="record.hide()"
+					alt="Delete">
+				</p:commandButton>
+
+			</p:dialog>
+
+			<p:dialog header="Deletar" widgetVar="remove" modal="false"> 
+                Prosseguir?
+                <p:commandButton value="Deletar"
+					actionListener="#{prontuariosBean.remover}" onclick="remove.hide()"
+					alt="Delete" />
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

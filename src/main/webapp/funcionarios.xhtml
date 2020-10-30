@@ -1,0 +1,147 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+	<ui:define name="content">
+		<h2 class="page-header">Gerenciamento de Funcionários</h2>
+
+		<br />
+
+		<h:form id="formPrincipal">
+			<p:messages id="messages" showDetail="true" closable="true" />
+
+			<div align="center">
+				<p:dataTable var="lista" value="#{funcionariosBean.allFuncionarios}"
+					id="tabela" emptyMessage="Nenhum registro encontrado"
+					paginatorTemplate="{RowsPerPageDropdown} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+					paginator="true" rows="10"
+					rowsPerPageTemplate="5,10,25,50,100,9999" style="width:100%">
+
+					<p:column headerText="Código" sortBy="#{lista.idFuncionario}"
+						filterBy="#{lista.idFuncionario}">
+						<h:outputText value="#{lista.idFuncionario}" />
+					</p:column>
+
+					<p:column headerText="Nome" sortBy="#{lista.nomeFuncionario}"
+						filterBy="#{lista.nomeFuncionario}">
+						<h:outputText value="#{lista.nomeFuncionario}" />
+					</p:column>
+
+					<p:column headerText="Cpf" sortBy="#{lista.cpf}"
+						filterBy="#{lista.cpf}">
+						<h:outputText value="#{lista.cpf}" />
+					</p:column>
+
+					<p:column headerText="Opções" exportable="false">
+						<center>
+							<p:commandButton icon="ui-icon-pencil" value="Editar"
+								onclick="PF('record').show();"
+								update="formPrincipal:panelRecord" process="@this">
+								<f:setPropertyActionListener
+									target="#{funcionariosBean.funcionarios}" value="#{lista}" />
+							</p:commandButton>
+
+							<p:commandButton icon="ui-icon-trash" title="Deletar"
+								actionListener="#{funcionariosBean.remover(lista.idFuncionario)}"
+								ajax="false" />
+						</center>
+					</p:column>
+				</p:dataTable>
+
+				<p:column>
+					<p:commandButton icon="ui-icon-plus" value="Novo"
+						onclick="PF('record').show();">
+					</p:commandButton>
+				</p:column>
+			</div>
+
+			<div align="center">
+				<h3>Exportar dados da página</h3>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/excel.png" width="24" />
+					<p:dataExporter type="xls" target="tabela" fileName="arq" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/pdf.png" width="24" />
+					<p:dataExporter type="pdf" target="tabela" fileName="arq" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/csv.png" width="24" />
+					<p:dataExporter type="csv" target="tabela" fileName="arq" />
+				</h:commandLink>
+
+				<h:commandLink>
+					<p:graphicImage name="images/exports/xml.png" width="24" />
+					<p:dataExporter type="xml" target="tabela" fileName="arq" />
+				</h:commandLink>
+			</div>
+
+			<p:dialog header="Novo" widgetVar="record" modal="false"
+				focus="nomeFuncionarios">
+				<p:panelGrid id="panelRecord" columns="2"> 
+                    Codigo:
+                    <p:inputText id="idFuncionarios"
+						value="#{funcionariosBean.funcionarios.idFuncionario}"
+						disabled="true" />
+						
+                    Nome:
+                    <p:inputText id="nomeFuncionarios"
+						value="#{funcionariosBean.funcionarios.nomeFuncionario}" />
+						
+                    Cpf:
+                    <p:inputText id="cpfFuncionarios"
+						value="#{funcionariosBean.funcionarios.cpf}" />
+						
+                    Rg:
+                    <p:inputText id="rgFuncionarios"
+						value="#{funcionariosBean.funcionarios.rg}" />
+						
+                    Crm:
+                    <p:inputText id="crmFuncionarios"
+						value="#{funcionariosBean.funcionarios.crm}" />
+						
+                    Endereco:
+                    <p:selectOneMenu id="trl"
+						value="#{funcionariosBean.idEndereco}" style="width:179px"
+						dir="ltr">
+						<c:forEach items="#{enderecosBean.enderecosList}" var="end">
+							<f:selectItem itemLabel="#{end.logradouro} #{end.numero}"
+								itemValue="#{end.idEndereco}" />
+						</c:forEach>
+					</p:selectOneMenu>
+					
+                    Tipo:
+                    <p:selectOneMenu id="tipoFuncionario"
+						value="#{funcionariosBean.tipoFuncionario}" style="width:179px"
+						dir="ltr">
+						<c:forEach items="#{tipoFuncionarioBean.tipoFuncionarios}"
+							var="tpFunc">
+							<f:selectItem itemLabel="#{tpFunc.nomeTipoFuncionario}"
+								itemValue="#{tpFunc.idtipoFuncionario}" />
+						</c:forEach>
+					</p:selectOneMenu>
+				</p:panelGrid>
+
+				<br />
+
+				<p:commandButton value="Salvar"
+					actionListener="#{funcionariosBean.salvar}" onclick="record.hide()"
+					alt="Record" />
+			</p:dialog>
+
+			<p:dialog header="Deletar" widgetVar="remove" modal="false"> 
+                Você tem certeza?
+                <p:commandButton value="Deletar"
+					actionListener="#{funcionariosBean.remover}"
+					onclick="remove.hide()" alt="Delete" />
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>
